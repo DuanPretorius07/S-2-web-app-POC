@@ -4,7 +4,7 @@ const GEONAMES_USERNAME = process.env.GEONAMES_USERNAME;
 const GEONAMES_BASE_URL = 'http://api.geonames.org';
 
 // #region agent log
-fetch('http://127.0.0.1:7242/ingest/fbdc8caf-9cc6-403b-83c1-f186ed9b4695',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'geonames.ts:module-load',message:'GEONAMES_USERNAME env check',data:{username:GEONAMES_USERNAME,usernameType:typeof GEONAMES_USERNAME,hasUsername:!!GEONAMES_USERNAME,allEnvKeys:Object.keys(process.env).filter(k=>k.includes('GEONAMES')||k.includes('geonames')).join(',')},timestamp:Date.now(),runId:'debug-geonames-env',hypothesisId:'H1'})}).catch(()=>{});
+(process.env.INGEST_URL ? fetch(process.env.INGEST_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'geonames.ts:module-load',message:'GEONAMES_USERNAME env check',data:{username:GEONAMES_USERNAME,usernameType:typeof GEONAMES_USERNAME,hasUsername:!!GEONAMES_USERNAME,allEnvKeys:Object.keys(process.env).filter(k=>k.includes('GEONAMES')||k.includes('geonames')).join(',')},timestamp:Date.now(),runId:'debug-geonames-env',hypothesisId:'H1'})}).catch(()=>{}) : undefined);
 // #endregion
 
 interface Country {
@@ -146,7 +146,7 @@ export async function getCountries(): Promise<Country[]> {
   if (cached) return cached;
 
   // #region agent log
-  fetch('http://127.0.0.1:7242/ingest/fbdc8caf-9cc6-403b-83c1-f186ed9b4695',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'geonames.ts:getCountries:before-api-call',message:'About to call GeoNames API',data:{username:GEONAMES_USERNAME,usernameType:typeof GEONAMES_USERNAME,url:`${GEONAMES_BASE_URL}/countryInfoJSON`},timestamp:Date.now(),runId:'debug-geonames-env',hypothesisId:'H2'})}).catch(()=>{});
+  (process.env.INGEST_URL ? fetch(process.env.INGEST_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'geonames.ts:getCountries:before-api-call',message:'About to call GeoNames API',data:{username:GEONAMES_USERNAME,usernameType:typeof GEONAMES_USERNAME,url:`${GEONAMES_BASE_URL}/countryInfoJSON`},timestamp:Date.now(),runId:'debug-geonames-env',hypothesisId:'H2'})}).catch(()=>{}) : undefined);
   // #endregion
 
   try {
@@ -296,7 +296,7 @@ export async function getPostalCodes(
     console.log(`[GeoNames] Received ${data.postalCodes?.length || 0} postal codes from API`);
 
     // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/fbdc8caf-9cc6-403b-83c1-f186ed9b4695',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'geonames.ts:getPostalCodes:beforeFilter',message:'Before filtering postal codes',data:{countryCode,adminCode1,placeName,rawPostalCodesCount:data.postalCodes?.length||0,samplePostalCodes:data.postalCodes?.slice(0,3).map((p:any)=>({postalCode:p.postalCode,placeName:p.placeName,adminCode1:p.adminCode1,adminName2:p.adminName2}))},timestamp:Date.now(),runId:'canada-postal-debug',hypothesisId:'H1,H2'})}).catch(()=>{});
+    (process.env.INGEST_URL ? fetch(process.env.INGEST_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'geonames.ts:getPostalCodes:beforeFilter',message:'Before filtering postal codes',data:{countryCode,adminCode1,placeName,rawPostalCodesCount:data.postalCodes?.length||0,samplePostalCodes:data.postalCodes?.slice(0,3).map((p:any)=>({postalCode:p.postalCode,placeName:p.placeName,adminCode1:p.adminCode1,adminName2:p.adminName2}))},timestamp:Date.now(),runId:'canada-postal-debug',hypothesisId:'H1,H2'})}).catch(()=>{}) : undefined);
     // #endregion
 
     // Normalize place name for matching (remove common suffixes, handle variations)
@@ -306,7 +306,7 @@ export async function getPostalCodes(
       .replace(/^st\s+/i, 'saint '); // Handle "St " prefix
 
     // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/fbdc8caf-9cc6-403b-83c1-f186ed9b4695',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'geonames.ts:getPostalCodes:normalized',message:'Place name normalized',data:{originalPlaceName:placeName,normalizedPlaceName,adminCode1},timestamp:Date.now(),runId:'canada-postal-debug',hypothesisId:'H3'})}).catch(()=>{});
+    (process.env.INGEST_URL ? fetch(process.env.INGEST_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'geonames.ts:getPostalCodes:normalized',message:'Place name normalized',data:{originalPlaceName:placeName,normalizedPlaceName,adminCode1},timestamp:Date.now(),runId:'canada-postal-debug',hypothesisId:'H3'})}).catch(()=>{}) : undefined);
     // #endregion
 
     const postalCodes: string[] = (data.postalCodes || [])
@@ -317,7 +317,7 @@ export async function getPostalCodes(
           const adminMatch = p.adminCode1 === adminCode1;
           // #region agent log
           if (!adminMatch) {
-            fetch('http://127.0.0.1:7242/ingest/fbdc8caf-9cc6-403b-83c1-f186ed9b4695',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'geonames.ts:getPostalCodes:filterCA',message:'Canada postal code filtered out',data:{postalCode:p.postalCode,placeName:p.placeName,pAdminCode1:p.adminCode1,expectedAdminCode1:adminCode1,adminMatch},timestamp:Date.now(),runId:'canada-postal-debug',hypothesisId:'H4'})}).catch(()=>{});
+            (process.env.INGEST_URL ? fetch(process.env.INGEST_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'geonames.ts:getPostalCodes:filterCA',message:'Canada postal code filtered out',data:{postalCode:p.postalCode,placeName:p.placeName,pAdminCode1:p.adminCode1,expectedAdminCode1:adminCode1,adminMatch},timestamp:Date.now(),runId:'canada-postal-debug',hypothesisId:'H4'})}).catch(()=>{}) : undefined);
           }
           // #endregion
           if (adminMatch) {
@@ -343,7 +343,7 @@ export async function getPostalCodes(
             
             // #region agent log
             if (!nameMatch) {
-              fetch('http://127.0.0.1:7242/ingest/fbdc8caf-9cc6-403b-83c1-f186ed9b4695',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'geonames.ts:getPostalCodes:filterCAName',message:'Canada postal code filtered by name',data:{postalCode:p.postalCode,pPlaceName,normalizedPlaceName,pAdminName2,nameMatch},timestamp:Date.now(),runId:'canada-postal-debug',hypothesisId:'H3'})}).catch(()=>{});
+              (process.env.INGEST_URL ? fetch(process.env.INGEST_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'geonames.ts:getPostalCodes:filterCAName',message:'Canada postal code filtered by name',data:{postalCode:p.postalCode,pPlaceName,normalizedPlaceName,pAdminName2,nameMatch},timestamp:Date.now(),runId:'canada-postal-debug',hypothesisId:'H3'})}).catch(()=>{}) : undefined);
             }
             // #endregion
             
@@ -387,7 +387,7 @@ export async function getPostalCodes(
     const uniqueCodes = [...new Set(postalCodes)].sort();
     
     // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/fbdc8caf-9cc6-403b-83c1-f186ed9b4695',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'geonames.ts:getPostalCodes:afterFilter',message:'After filtering postal codes',data:{countryCode,adminCode1,placeName,filteredCount:postalCodes.length,uniqueCount:uniqueCodes.length,uniqueCodes:uniqueCodes.slice(0,5)},timestamp:Date.now(),runId:'canada-postal-debug',hypothesisId:'H2,H3,H4'})}).catch(()=>{});
+    (process.env.INGEST_URL ? fetch(process.env.INGEST_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'geonames.ts:getPostalCodes:afterFilter',message:'After filtering postal codes',data:{countryCode,adminCode1,placeName,filteredCount:postalCodes.length,uniqueCount:uniqueCodes.length,uniqueCodes:uniqueCodes.slice(0,5)},timestamp:Date.now(),runId:'canada-postal-debug',hypothesisId:'H2,H3,H4'})}).catch(()=>{}) : undefined);
     // #endregion
     
     console.log(`[GeoNames] Filtered to ${uniqueCodes.length} unique postal codes`);
@@ -413,6 +413,50 @@ export async function getPostalCodes(
     
     // Return empty array instead of throwing - allow manual entry
     return [];
+  }
+}
+
+/**
+ * Reverse lookup: Get city and state from ZIP code.
+ * Allows users to enter only ZIP and auto-populate location.
+ */
+export async function reverseZipCodeLookup(
+  countryCode: string,
+  zipCode: string
+): Promise<{
+  city: string;
+  state: string;
+  stateCode: string;
+  stateName: string;
+  latitude: number;
+  longitude: number;
+} | null> {
+  try {
+    console.log(`[GeoNames] Reverse lookup for ZIP: ${zipCode} in ${countryCode}`);
+
+    const data = await geonamesRequest<any>('/postalCodeLookupJSON', {
+      postalcode: zipCode.trim(),
+      country: countryCode,
+    });
+
+    const results = data.postalcodes || data.postalCodes || [];
+    if (results.length === 0) {
+      console.log('[GeoNames] No results for ZIP code');
+      return null;
+    }
+
+    const result = results[0];
+    return {
+      city: result.placeName || result.placename || '',
+      state: result.adminCode1 || '',
+      stateCode: result.adminCode1 || '',
+      stateName: result.adminName1 || result.adminCode1 || '',
+      latitude: parseFloat(result.lat) || 0,
+      longitude: parseFloat(result.lng) || 0,
+    };
+  } catch (error: any) {
+    console.error('[GeoNames] Reverse lookup failed:', error.message);
+    return null;
   }
 }
 

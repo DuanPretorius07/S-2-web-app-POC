@@ -106,6 +106,7 @@ export default function QuoteForm() {
     error?: string;
   }>({ status: 'idle' });
   const [showRatesModal, setShowRatesModal] = useState(false);
+  const [hasBookedFromCurrentRates, setHasBookedFromCurrentRates] = useState(false);
   const [formHasChanged, setFormHasChanged] = useState(false);
   const [showTokensNotification, setShowTokensNotification] = useState(false);
   const [tokensNotificationData, setTokensNotificationData] = useState<{
@@ -174,13 +175,11 @@ export default function QuoteForm() {
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
 
+    // Origin: country and ZIP required; city and state optional (ZIP-only lookup supported)
     if (!formData.origin.country) newErrors['origin.country'] = 'Origin country is required';
-    if (!formData.origin.state) newErrors['origin.state'] = 'Origin state is required';
-    if (!formData.origin.city.trim()) newErrors['origin.city'] = 'Origin city is required';
     if (!formData.origin.zipCode.trim()) newErrors['origin.zipCode'] = 'Origin ZIP code is required';
+    // Destination: country and ZIP required; city and state optional
     if (!formData.destination.country) newErrors['destination.country'] = 'Destination country is required';
-    if (!formData.destination.state) newErrors['destination.state'] = 'Destination state is required';
-    if (!formData.destination.city.trim()) newErrors['destination.city'] = 'Destination city is required';
     if (!formData.destination.zipCode.trim()) newErrors['destination.zipCode'] = 'Destination ZIP code is required';
     if (!formData.pickupDate) newErrors.pickupDate = 'Pickup date is required';
 
@@ -425,6 +424,7 @@ export default function QuoteForm() {
 
       setRates(receivedRates);
       setBookingState({ status: 'idle' }); // Reset booking state on new rates
+      setHasBookedFromCurrentRates(false); // New batch = one booking allowed
       setShowRatesModal(true); // Show rates in modal
       setFormHasChanged(false); // Reset form changed flag after successful rates
 
@@ -456,6 +456,10 @@ export default function QuoteForm() {
   };
 
   const handleBook = async (rateId: string) => {
+    // One booking per quote batch only
+    if (hasBookedFromCurrentRates) {
+      return;
+    }
     // Find the selected rate
     const selectedRate = rates.find(r => r.id === rateId);
     if (!selectedRate) {
@@ -550,12 +554,13 @@ export default function QuoteForm() {
         throw new Error(data.message || 'Failed to save quote/rate request');
       }
 
-      // Mark rate as requested
+      // Mark rate as requested and exhaust booking for this batch (one booking per quote)
       setRates(prevRates =>
         prevRates.map(rate =>
           rate.id === rateId ? { ...rate, booked: true } : rate
         )
       );
+      setHasBookedFromCurrentRates(true);
 
       setBookingState({
         status: 'success',
@@ -944,6 +949,7 @@ export default function QuoteForm() {
           onBook={handleBook}
           onClose={() => setShowRatesModal(false)}
           loading={bookingState.status === 'booking'}
+          bookingExhausted={hasBookedFromCurrentRates}
         />
       )}
 

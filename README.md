@@ -15,13 +15,16 @@ A full-stack shipping quote and booking portal web application designed for HubS
   - At least one number
   - Clear error messages for each requirement
 - **Location Management**: Full country/state/city/ZIP code selection with GeoNames API
+  - **ZIP-only entry**: Users can enter just country + ZIP; city and state are optional. Toggle "Enter ZIP only" to auto-lookup city/state from ZIP.
   - Robust retry logic with exponential backoff
   - 7-day caching for improved performance
   - Manual ZIP code entry fallback
   - Error handling with fallback to expired cache
 - **Shipping Flow**: Get rates → View results → Book shipment
+  - **Single Rate Selection**: Only one rate can be selected and booked per search (S2 requirement); visual radio-style selection with one "Request to Book" button
 - **HubSpot Integration**: Embeddable via iframe or script loader with context prefill
 - **HubSpot CRM Writeback**: Automatic contact sync and rate request notes (when configured)
+  - **Company creation & association**: When a company name is provided at registration, a HubSpot company is created (or found by name) and the contact is associated with it (association type: contact-to-company).
   - **Comprehensive Logging**: All rate requests are logged to HubSpot notes (success, no rates, errors)
   - **Status Indicators**: Notes include status indicators (✅ success, ⚠️ no rates, ❌ errors)
   - **Error Logging**: API errors are logged to HubSpot with detailed error messages
@@ -237,6 +240,7 @@ npm run test:client
 - `GET /api/locations/cities?country=US&state=CA` - Get cities for a state
 - `GET /api/locations/postal-codes?country=US&state=CA&city=Los Angeles` - Get postal codes for a city
 - `GET /api/locations/lookup?country=US&postalCode=90210` - Reverse lookup location by postal code
+- `GET /api/locations/reverse-zip?country=US&zipCode=90210` - Reverse lookup: get city/state from ZIP (for ZIP-only entry)
 
 All location endpoints:
 - Use retry logic with exponential backoff (3 retries)
@@ -454,7 +458,7 @@ Ensure all required environment variables are set in production (see `server/env
 - `GEONAMES_USERNAME` - GeoNames API username
 
 **Optional:**
-- `HUBSPOT_PRIVATE_APP_TOKEN` - For automatic contact sync and notes
+- `HUBSPOT_PRIVATE_APP_TOKEN` - For automatic contact sync, notes, and company creation/association. If using company association, the HubSpot Private App must have scopes: `crm.objects.contacts.read`, `crm.objects.contacts.write`, `crm.objects.companies.read`, `crm.objects.companies.write`, `crm.objects.notes.read`, `crm.objects.notes.write`.
 - `ALLOWED_ORIGINS` - Comma-separated list of allowed CORS origins
 - `PORT` - Server port (default: 5000)
 - `NODE_ENV` - Set to `production` in production
@@ -508,9 +512,34 @@ The application requires a PostgreSQL function for rate token management. This f
 
 **IMPORTANT**: When setting up your database, make sure to run the **entire** `server/supabase/schema.sql` file, including the function definition at the end. Without this function, rate token consumption will fail.
 
+## Manual Configuration
+
+### Supabase
+
+- No schema changes are required for these features. Ensure you have run the full `server/supabase/schema.sql` (including the `consume_rate_token()` function) as described in Setup.
+- If you add new migrations under `server/supabase/migrations/`, run them in the Supabase SQL editor in order.
+
+### Environment (`.env`)
+
+- **ZIP-only / reverse lookup**: Uses existing `GEONAMES_USERNAME`. No new variables.
+- **HubSpot company integration**: Uses existing `HUBSPOT_PRIVATE_APP_TOKEN` (or `HUBSPOT_ACCESS_TOKEN`). No new variables. You must add the following scopes to your HubSpot Private App (HubSpot → Settings → Integrations → Private Apps → Your app → Scopes):
+  - `crm.objects.companies.read`
+  - `crm.objects.companies.write`
+  Without these, company creation and contact–company association are skipped (registration and contact sync still work).
+
+### Summary of manual steps
+
+1. **Supabase**: Run `server/supabase/schema.sql` if not already done; run any new migrations.
+2. **HubSpot**: In the Private App used by `HUBSPOT_PRIVATE_APP_TOKEN`, enable scopes `crm.objects.companies.read` and `crm.objects.companies.write`.
+3. **`.env`**: No new keys; ensure `GEONAMES_USERNAME` and (optional) `HUBSPOT_PRIVATE_APP_TOKEN` are set as in `server/env.example`.
+
 ## Recent Updates
 
 ### Latest Changes (February 2025)
+
+- **Single rate selection**: Only one rate can be selected per search; one "Request to Book" button; click selected rate to deselect.
+- **ZIP-only location entry**: "Enter ZIP only" mode in location selector; reverse lookup fills city/state; form validation requires only country + ZIP (city/state optional).
+- **HubSpot company integration**: On registration with a company name, a HubSpot company is created or found and the contact is associated with it.
 
 - **Token Expiration Fix**: Fixed token expiration modal appearing incorrectly
   - Modal now only appears when token actually expires (TOKEN_EXPIRED error code)

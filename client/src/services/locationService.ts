@@ -220,3 +220,31 @@ export async function lookupPostalCode(
     return null;
   }
 }
+
+export interface ReverseZipLocation {
+  city: string;
+  state: string;
+  stateCode: string;
+  stateName: string;
+  latitude: number;
+  longitude: number;
+}
+
+/**
+ * Reverse lookup: get city and state from ZIP code (for ZIP-only entry)
+ */
+export async function fetchReverseZip(
+  countryCode: string,
+  zipCode: string
+): Promise<ReverseZipLocation | null> {
+  try {
+    const response = await axios.get(`${API_BASE}/reverse-zip`, {
+      params: { country: countryCode, zipCode: zipCode.trim() },
+      timeout: 10000,
+    });
+    return response.data?.location ?? null;
+  } catch (error) {
+    console.error('Error reverse lookup ZIP:', error);
+    return null;
+  }
+}

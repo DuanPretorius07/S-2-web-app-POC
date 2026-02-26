@@ -40,11 +40,17 @@ export default function Login() {
     setLoading(true);
 
     try {
-      if (isRegister) {
+        if (isRegister) {
         // Client-side validation
         const pwdError = validatePassword(password);
         if (pwdError) {
           setPasswordError(pwdError);
+          setLoading(false);
+          return;
+        }
+        if (!companyName || !companyName.trim()) {
+          setFieldErrors((prev) => ({ ...prev, clientName: 'Company name is required' }));
+          setError('Please fix the errors below');
           setLoading(false);
           return;
         }
@@ -55,7 +61,7 @@ export default function Login() {
             password,
             firstName,
             lastName,
-            companyName: companyName || undefined,
+            companyName: companyName.trim(),
             // HubSpot/CRM sync is now always enabled for new registrations
             hubspotOptIn: true,
           });
@@ -183,17 +189,16 @@ export default function Login() {
                   )}
                 </div>
                 <div>
-                  <label htmlFor="company-name" className="sr-only">
-                    Company name (optional)
-                  </label>
+                  
                   <input
                     id="company-name"
                     name="companyName"
                     type="text"
+                    required
                     className={`appearance-none rounded-none relative block w-full px-3 py-2 border ${
                       fieldErrors.clientName ? 'border-red-500' : 'border-gray-300'
                     } placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-s2-red focus:border-s2-red focus:z-10 sm:text-sm`}
-                    placeholder="Company name (optional)"
+                    placeholder="Enter your company name"
                     value={companyName}
                     onChange={(e) => {
                       setCompanyName(e.target.value);

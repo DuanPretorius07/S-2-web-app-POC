@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
+import { INGEST_URL } from '../config/api';
 
 interface User {
   id: string;
@@ -100,7 +101,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   async function login(email: string, password: string) {
     // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/fbdc8caf-9cc6-403b-83c1-f186ed9b4695',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AuthContext.tsx:login',message:'Login started',data:{email,isLoggingOut:isLoggingOutRef.current},timestamp:Date.now()})}).catch(()=>{});
+    (INGEST_URL ? fetch(INGEST_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AuthContext.tsx:login',message:'Login started',data:{email,isLoggingOut:isLoggingOutRef.current},timestamp:Date.now()})}).catch(()=>{}) : undefined);
     // #endregion
     
     // Clear any existing token state before login
@@ -117,14 +118,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
 
       // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/fbdc8caf-9cc6-403b-83c1-f186ed9b4695',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AuthContext.tsx:login',message:'Login response received',data:{status:response.status,ok:response.ok},timestamp:Date.now()})}).catch(()=>{});
+      (INGEST_URL ? fetch(INGEST_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AuthContext.tsx:login',message:'Login response received',data:{status:response.status,ok:response.ok},timestamp:Date.now()})}).catch(()=>{}) : undefined);
       // #endregion
 
       // Get response as text first to handle non-JSON responses
       const responseText = await response.text();
 
       // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/fbdc8caf-9cc6-403b-83c1-f186ed9b4695',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AuthContext.tsx:login',message:'Login response text parsed',data:{responseTextLength:responseText.length,responseTextPreview:responseText.substring(0,200)},timestamp:Date.now()})}).catch(()=>{});
+      (INGEST_URL ? fetch(INGEST_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AuthContext.tsx:login',message:'Login response text parsed',data:{responseTextLength:responseText.length,responseTextPreview:responseText.substring(0,200)},timestamp:Date.now()})}).catch(()=>{}) : undefined);
       // #endregion
 
       if (!response.ok) {
@@ -132,11 +133,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         try {
           error = JSON.parse(responseText);
           // #region agent log
-          fetch('http://127.0.0.1:7242/ingest/fbdc8caf-9cc6-403b-83c1-f186ed9b4695',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AuthContext.tsx:login',message:'Login error parsed',data:{errorCode:error.errorCode,message:error.message,status:response.status},timestamp:Date.now()})}).catch(()=>{});
+          (INGEST_URL ? fetch(INGEST_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AuthContext.tsx:login',message:'Login error parsed',data:{errorCode:error.errorCode,message:error.message,status:response.status},timestamp:Date.now()})}).catch(()=>{}) : undefined);
           // #endregion
         } catch (e) {
           // #region agent log
-          fetch('http://127.0.0.1:7242/ingest/fbdc8caf-9cc6-403b-83c1-f186ed9b4695',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AuthContext.tsx:login',message:'Login error JSON parse failed',data:{status:response.status,responseText,parseError:e},timestamp:Date.now()})}).catch(()=>{});
+          (INGEST_URL ? fetch(INGEST_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AuthContext.tsx:login',message:'Login error JSON parse failed',data:{status:response.status,responseText,parseError:e},timestamp:Date.now()})}).catch(()=>{}) : undefined);
           // #endregion
           throw new Error(`Login failed with status ${response.status}: ${responseText || 'No response body'}`);
         }
@@ -147,11 +148,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       try {
         data = JSON.parse(responseText);
         // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/fbdc8caf-9cc6-403b-83c1-f186ed9b4695',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AuthContext.tsx:login',message:'Login success',data:{hasUser:!!data.user,userId:data.user?.id},timestamp:Date.now()})}).catch(()=>{});
+        (INGEST_URL ? fetch(INGEST_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AuthContext.tsx:login',message:'Login success',data:{hasUser:!!data.user,userId:data.user?.id},timestamp:Date.now()})}).catch(()=>{}) : undefined);
         // #endregion
       } catch (e) {
         // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/fbdc8caf-9cc6-403b-83c1-f186ed9b4695',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AuthContext.tsx:login',message:'Login success JSON parse failed',data:{status:response.status,responseText,parseError:e},timestamp:Date.now()})}).catch(()=>{});
+        (INGEST_URL ? fetch(INGEST_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AuthContext.tsx:login',message:'Login success JSON parse failed',data:{status:response.status,responseText,parseError:e},timestamp:Date.now()})}).catch(()=>{}) : undefined);
         // #endregion
         throw new Error(`Failed to parse response: ${responseText || 'Empty response'}`);
       }
@@ -161,7 +162,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setTokenExpired(false);
     } catch (error: any) {
       // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/fbdc8caf-9cc6-403b-83c1-f186ed9b4695',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AuthContext.tsx:login',message:'Login exception caught',data:{errorMessage:error?.message,errorName:error?.name,hasStack:!!error?.stack},timestamp:Date.now()})}).catch(()=>{});
+      (INGEST_URL ? fetch(INGEST_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AuthContext.tsx:login',message:'Login exception caught',data:{errorMessage:error?.message,errorName:error?.name,hasStack:!!error?.stack},timestamp:Date.now()})}).catch(()=>{}) : undefined);
       // #endregion
       throw error; // Re-throw to be handled by Login component
     }
@@ -208,7 +209,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setTokenExpired(false);
     
     // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/fbdc8caf-9cc6-403b-83c1-f186ed9b4695',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AuthContext.tsx:70',message:'Register request start',data:{email,hasCompanyName:!!companyName},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+    (INGEST_URL ? fetch(INGEST_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AuthContext.tsx:70',message:'Register request start',data:{email,hasCompanyName:!!companyName},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{}) : undefined);
     // #endregion
     const response = await fetch('/api/auth/register', {
       method: 'POST',
@@ -226,7 +227,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // #region agent log
     const responseText = await response.text();
-    fetch('http://127.0.0.1:7242/ingest/fbdc8caf-9cc6-403b-83c1-f186ed9b4695',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AuthContext.tsx:80',message:'Register response received',data:{status:response.status,ok:response.ok,hasBody:!!responseText,bodyLength:responseText.length,bodyPreview:responseText.substring(0,200)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+    (INGEST_URL ? fetch(INGEST_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AuthContext.tsx:80',message:'Register response received',data:{status:response.status,ok:response.ok,hasBody:!!responseText,bodyLength:responseText.length,bodyPreview:responseText.substring(0,200)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{}) : undefined);
     // #endregion
 
     if (!response.ok) {
@@ -235,7 +236,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         error = JSON.parse(responseText);
       } catch (e) {
         // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/fbdc8caf-9cc6-403b-83c1-f186ed9b4695',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AuthContext.tsx:88',message:'JSON parse error on error response',data:{status:response.status,responseText,parseError:e},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+        (INGEST_URL ? fetch(INGEST_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AuthContext.tsx:88',message:'JSON parse error on error response',data:{status:response.status,responseText,parseError:e},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{}) : undefined);
         // #endregion
         throw new Error(`Registration failed with status ${response.status}: ${responseText || 'No response body'}`);
       }
@@ -252,11 +253,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       data = JSON.parse(responseText);
       // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/fbdc8caf-9cc6-403b-83c1-f186ed9b4695',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AuthContext.tsx:98',message:'Register success',data:{hasUser:!!data.user},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+      (INGEST_URL ? fetch(INGEST_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AuthContext.tsx:98',message:'Register success',data:{hasUser:!!data.user},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{}) : undefined);
       // #endregion
     } catch (e) {
       // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/fbdc8caf-9cc6-403b-83c1-f186ed9b4695',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AuthContext.tsx:102',message:'JSON parse error on success response',data:{status:response.status,responseText,parseError:e},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+      (INGEST_URL ? fetch(INGEST_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AuthContext.tsx:102',message:'JSON parse error on success response',data:{status:response.status,responseText,parseError:e},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{}) : undefined);
       // #endregion
       throw new Error(`Failed to parse response: ${responseText || 'Empty response'}`);
     }

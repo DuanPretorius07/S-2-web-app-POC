@@ -4,11 +4,13 @@ import { useAuth } from '../contexts/AuthContext';
 export default function RateTokensNotification() {
   const { user } = useAuth();
   const [showNotification, setShowNotification] = useState(false);
+  const [showOutOfTokensModal, setShowOutOfTokensModal] = useState(false);
   const previousTokensRef = useRef<{ remaining: number | null; used: number | null } | null>(null);
 
   useEffect(() => {
     if (!user) {
       setShowNotification(false);
+      setShowOutOfTokensModal(false);
       previousTokensRef.current = null;
       return;
     }
@@ -16,38 +18,65 @@ export default function RateTokensNotification() {
     const tokensRemaining = user.rateTokensRemaining ?? 3;
     const tokensUsed = user.rateTokensUsed ?? 0;
     const previousTokens = previousTokensRef.current;
+    const isFirstLoad = previousTokens === null;
+    const tokensChanged = previousTokens !== null && (previousTokens.remaining !== tokensRemaining || previousTokens.used !== tokensUsed);
 
-    // Show notification:
-    // 1. After login (when user first loads and has tokens)
-    // 2. After rate search (when tokens change)
-    const shouldShow = 
-      // First time user loads (after login)
-      previousTokens === null ||
-      // Tokens changed (after rate search)
-      (previousTokens.remaining !== tokensRemaining || previousTokens.used !== tokensUsed);
-
+    const shouldShow = isFirstLoad || tokensChanged;
     if (shouldShow) {
+      previousTokensRef.current = { remaining: tokensRemaining, used: tokensUsed };
       setShowNotification(true);
-      previousTokensRef.current = {
-        remaining: tokensRemaining,
-        used: tokensUsed,
-      };
-      
-      // Auto-hide after 8 seconds
-      const timer = setTimeout(() => {
-        setShowNotification(false);
-      }, 8000);
-      
-      return () => clearTimeout(timer);
+      // On first load (login) with 0 tokens, show prominent modal immediately
+      if (tokensRemaining === 0 && isFirstLoad) {
+        setShowOutOfTokensModal(true);
+      }
+      if (tokensRemaining !== 0) {
+        const timer = setTimeout(() => setShowNotification(false), 8000);
+        return () => clearTimeout(timer);
+      }
     }
   }, [user]);
 
-  if (!showNotification || !user) return null;
+  if (!user) return null;
 
   const tokensRemaining = user.rateTokensRemaining ?? 3;
   const tokensUsed = user.rateTokensUsed ?? 0;
   const isNewUser = tokensUsed === 0 && tokensRemaining === 3;
   const hasNoTokens = tokensRemaining === 0;
+
+  // When user logged in with 0 tokens: show prominent modal (immediate pop-up)
+  if (showOutOfTokensModal && hasNoTokens) {
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100] p-4">
+        <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6 border-2 border-red-200">
+          <div className="flex items-start gap-4">
+            <span className="text-3xl flex-shrink-0" aria-hidden>⚠️</span>
+            <div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">Out of rate tokens</h3>
+              <p className="text-gray-700 mb-4">
+                You have used all of your rate request tokens. If you would like to request additional quotes or take this further, please contact S2 International directly. We will be happy to assist you.
+              </p>
+              <a
+                href="https://www.s-2international.com/contact"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block text-s2-red font-semibold hover:underline mb-4"
+              >
+                Contact S2 International →
+              </a>
+              <button
+                onClick={() => { setShowOutOfTokensModal(false); setShowNotification(false); }}
+                className="w-full py-3 px-4 bg-gray-100 text-gray-800 rounded-lg font-semibold hover:bg-gray-200"
+              >
+                Got it
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!showNotification) return null;
 
   return (
     <div className="fixed top-4 right-4 z-50 max-w-md animate-slide-in">

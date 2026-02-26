@@ -1,9 +1,10 @@
+import { INGEST_URL } from '../config/api';
 import { useEffect } from 'react';
 
 export default function AnimatedBackground() {
   // #region agent log
-  if (typeof window !== 'undefined') {
-    fetch('http://127.0.0.1:7242/ingest/fbdc8caf-9cc6-403b-83c1-f186ed9b4695',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AnimatedBackground.tsx:4',message:'AnimatedBackground component rendering',data:{stripeCount:32},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
+  if (typeof window !== 'undefined' && INGEST_URL) {
+    fetch(INGEST_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AnimatedBackground.tsx:4',message:'AnimatedBackground component rendering',data:{stripeCount:32},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
   }
   // #endregion
 
@@ -71,9 +72,9 @@ export default function AnimatedBackground() {
       if (bgElement) {
         const computed = window.getComputedStyle(bgElement);
         const rect = bgElement.getBoundingClientRect();
-        fetch('http://127.0.0.1:7242/ingest/fbdc8caf-9cc6-403b-83c1-f186ed9b4695',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AnimatedBackground.tsx:useEffect',message:'Background element found in DOM',data:{position:computed.position,zIndex:computed.zIndex,display:computed.display,visibility:computed.visibility,width:rect.width,height:rect.height,hasStripeContainer:!!stripeContainer},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'B'})}).catch(()=>{});
+        if (INGEST_URL) fetch(INGEST_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AnimatedBackground.tsx:useEffect',message:'Background element found in DOM',data:{position:computed.position,zIndex:computed.zIndex,display:computed.display,visibility:computed.visibility,width:rect.width,height:rect.height,hasStripeContainer:!!stripeContainer},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'B'})}).catch(()=>{});
       } else {
-        fetch('http://127.0.0.1:7242/ingest/fbdc8caf-9cc6-403b-83c1-f186ed9b4695',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AnimatedBackground.tsx:useEffect',message:'Background element NOT found in DOM',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'C'})}).catch(()=>{});
+        if (INGEST_URL) fetch(INGEST_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AnimatedBackground.tsx:useEffect',message:'Background element NOT found in DOM',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'C'})}).catch(()=>{});
       }
     }, 100);
   }, []);

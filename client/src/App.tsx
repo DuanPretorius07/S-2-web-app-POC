@@ -12,6 +12,7 @@ import HubSpotEmbed from './components/HubSpotEmbed';
 import HelpButton from './components/HelpButton';
 import RateTokensNotification from './components/RateTokensNotification';
 import TokenExpirationModal from './components/TokenExpirationModal';
+import ErrorBoundary from './components/ErrorBoundary';
 
 function AppRoutes() {
   const { user, loading, tokenExpired } = useAuth();
@@ -73,15 +74,17 @@ function AppRoutes() {
 
 function App() {
   return (
-    <BrowserRouter>
-      <AuthProvider>
-        <HubSpotEmbed>
-          <AppRoutes />
-          <HelpButton />
-        </HubSpotEmbed>
-        <RateTokensNotification />
-      </AuthProvider>
-    </BrowserRouter>
+    <ErrorBoundary>
+      <BrowserRouter>
+        <AuthProvider>
+          <HubSpotEmbed>
+            <AppRoutes />
+            <HelpButton />
+          </HubSpotEmbed>
+          <RateTokensNotification />
+        </AuthProvider>
+      </BrowserRouter>
+    </ErrorBoundary>
   );
 }
 

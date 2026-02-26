@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { INGEST_URL } from '../config/api';
 
 interface NavbarProps {
   currentPath: string;
@@ -10,14 +11,14 @@ export default function Navbar({ currentPath, userEmail, onLogout }: NavbarProps
   const isActive = (path: string) => currentPath === path;
 
   // #region agent log
-  fetch('http://127.0.0.1:7242/ingest/fbdc8caf-9cc6-403b-83c1-f186ed9b4695',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Navbar.tsx:12',message:'Navbar component rendering',data:{currentPath,hasUserEmail:!!userEmail},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
+  if (INGEST_URL) fetch(INGEST_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Navbar.tsx:12',message:'Navbar component rendering',data:{currentPath,hasUserEmail:!!userEmail},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
   // #endregion
 
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
     const target = e.target as HTMLImageElement;
     
     // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/fbdc8caf-9cc6-403b-83c1-f186ed9b4695',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Navbar.tsx:handleImageError',message:'Logo image error',data:{src:target.src,attemptedSrc:target.src.includes('s2-logo.png')?'s2-logo.png':'logo.png'},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+    if (INGEST_URL) fetch(INGEST_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Navbar.tsx:handleImageError',message:'Logo image error',data:{src:target.src,attemptedSrc:target.src.includes('s2-logo.png')?'s2-logo.png':'logo.png'},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
     // #endregion
     
     if (!target.src.includes('s2-logo.png')) {
@@ -28,7 +29,7 @@ export default function Navbar({ currentPath, userEmail, onLogout }: NavbarProps
   const handleImageLoad = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
     // #region agent log
     const target = e.target as HTMLImageElement;
-    fetch('http://127.0.0.1:7242/ingest/fbdc8caf-9cc6-403b-83c1-f186ed9b4695',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Navbar.tsx:handleImageLoad',message:'Logo image loaded successfully',data:{src:target.src,width:target.naturalWidth,height:target.naturalHeight},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+    if (INGEST_URL) fetch(INGEST_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Navbar.tsx:handleImageLoad',message:'Logo image loaded successfully',data:{src:target.src,width:target.naturalWidth,height:target.naturalHeight},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
     // #endregion
   };
 

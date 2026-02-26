@@ -181,11 +181,9 @@ export default function LocationSelector({
 
   const handleManualZipChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let zipValue = e.target.value;
-    
+
     // For Canada, allow spaces in postal codes (format: A1A 1A1)
-    // Auto-format Canadian postal codes as user types
     if (value.country === 'CA') {
-      // Remove all spaces first, then add space after 3rd character if length > 3
       const cleaned = zipValue.replace(/\s/g, '').toUpperCase();
       if (cleaned.length > 3) {
         zipValue = `${cleaned.slice(0, 3)} ${cleaned.slice(3, 6)}`;
@@ -193,14 +191,10 @@ export default function LocationSelector({
         zipValue = cleaned;
       }
     } else {
-      // For US, remove spaces (ZIP codes are 5 or 9 digits)
       zipValue = zipValue.replace(/\s/g, '');
     }
-    
-    onChange({
-      ...value,
-      zipCode: zipValue,
-    });
+
+    onChange({ ...value, zipCode: zipValue });
   };
 
   // Convert data to react-select options
@@ -293,7 +287,7 @@ export default function LocationSelector({
         {/* State/Province */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            {value.country === 'CA' ? 'Province' : 'State'} *
+            {value.country === 'CA' ? 'Province' : 'State'}
           </label>
           <Select
             options={stateOptions}
@@ -306,7 +300,7 @@ export default function LocationSelector({
             styles={customStyles}
             placeholder={
               value.country
-                ? 'Select or search state...'
+                ? 'Select or skip'
                 : 'Select country first'
             }
             isClearable
@@ -325,7 +319,7 @@ export default function LocationSelector({
         {/* City */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            City *
+            City
           </label>
           <Select
             options={cityOptions}
@@ -336,7 +330,7 @@ export default function LocationSelector({
               loadingCities
                 ? 'Loading cities...'
                 : value.state
-                ? 'Select or search city...'
+                ? 'Select or skip'
                 : 'Select state first'
             }
             isClearable
@@ -373,8 +367,13 @@ export default function LocationSelector({
                 className={`w-full border rounded px-3 py-2 ${
                   errors.zipCode ? 'border-red-500' : 'border-gray-300'
                 } focus:border-blue-500 focus:ring-1 focus:ring-blue-500`}
-                placeholder={value.country === 'CA' ? 'Enter postal code (e.g., R0K 0B8)' : 'Enter ZIP code'}
+                placeholder={value.country === 'CA' ? 'Enter postal code (e.g., A1A 1A1)' : 'Enter ZIP code'}
               />
+              {postalCodes.length === 0 && !loadingPostalCodes && value.city && (
+                <p className="text-xs text-amber-600 mt-1">
+                  No postal codes found for this city. Please enter manually.
+                </p>
+              )}
               {postalCodes.length > 0 && (
                 <button
                   type="button"

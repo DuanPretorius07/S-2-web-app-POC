@@ -5,6 +5,7 @@ import {
   getCities,
   getPostalCodes,
   lookupPostalCode,
+  reverseZipCodeLookup,
 } from '../services/geonames.js';
 
 const router = express.Router();
@@ -90,6 +91,37 @@ router.get('/postal-codes', async (req, res) => {
     console.error('[Locations] Error fetching postal codes:', error);
     res.status(500).json({
       error: 'Failed to fetch postal codes',
+      message: error.message,
+    });
+  }
+});
+
+// GET /api/locations/reverse-zip?country=US&zipCode=90210
+router.get('/reverse-zip', async (req, res) => {
+  try {
+    const { country, zipCode } = req.query;
+
+    if (!country || typeof country !== 'string') {
+      return res.status(400).json({ error: 'Country code is required' });
+    }
+    if (!zipCode || typeof zipCode !== 'string') {
+      return res.status(400).json({ error: 'ZIP code is required' });
+    }
+
+    const location = await reverseZipCodeLookup(country, zipCode);
+
+    if (!location) {
+      return res.status(404).json({
+        error: 'ZIP code not found',
+        message: 'Unable to find location for this ZIP code. Please enter city and state manually.',
+      });
+    }
+
+    res.json({ location });
+  } catch (error: any) {
+    console.error('[Locations] Reverse ZIP lookup error:', error);
+    res.status(500).json({
+      error: 'Failed to lookup ZIP code',
       message: error.message,
     });
   }

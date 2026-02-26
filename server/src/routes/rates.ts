@@ -187,11 +187,11 @@ async function callRatesAPI(requestBody: any): Promise<any> {
     };
 
     // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/fbdc8caf-9cc6-403b-83c1-f186ed9b4695',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'rates.ts:callRatesAPI:enhancedBody',message:'Enhanced body created',data:{originCity:enhancedBody.originCity,originState:enhancedBody.originState,destinationCity:enhancedBody.destinationCity,destinationState:enhancedBody.destinationState,originZipcode:enhancedBody.originZipcode,destinationZipcode:enhancedBody.destinationZipcode,hasFreightInfo:Array.isArray(enhancedBody.freightInfo),freightInfoLength:Array.isArray(enhancedBody.freightInfo)?enhancedBody.freightInfo.length:0},timestamp:Date.now(),runId:'debug-ship2primus',hypothesisId:'H2,H4'})}).catch(()=>{});
+    (process.env.INGEST_URL ? fetch(process.env.INGEST_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'rates.ts:callRatesAPI:enhancedBody',message:'Enhanced body created',data:{originCity:enhancedBody.originCity,originState:enhancedBody.originState,destinationCity:enhancedBody.destinationCity,destinationState:enhancedBody.destinationState,originZipcode:enhancedBody.originZipcode,destinationZipcode:enhancedBody.destinationZipcode,hasFreightInfo:Array.isArray(enhancedBody.freightInfo),freightInfoLength:Array.isArray(enhancedBody.freightInfo)?enhancedBody.freightInfo.length:0},timestamp:Date.now(),runId:'debug-ship2primus',hypothesisId:'H2,H4'})}).catch(()=>{}) : undefined);
     // #endregion
 
     // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/fbdc8caf-9cc6-403b-83c1-f186ed9b4695',{
+    (process.env.INGEST_URL ? fetch(process.env.INGEST_URL,{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
@@ -209,7 +209,7 @@ async function callRatesAPI(requestBody: any): Promise<any> {
         },
         timestamp:Date.now()
       })
-    }).catch(()=>{});
+    }).catch(()=>{}) : undefined);
     // #endregion
 
     // Use Ship2Primus client if configured, otherwise fall back to legacy API Gateway
@@ -224,7 +224,7 @@ async function callRatesAPI(requestBody: any): Promise<any> {
       const rateTypes = Array.isArray(rateTypesList) && rateTypesList.length > 0 ? rateTypesList : ['LTL'];
       
       // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/fbdc8caf-9cc6-403b-83c1-f186ed9b4695',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'rates.ts:callRatesAPI:strategy',message:'Rate fetching strategy',data:{rateTypesCount:rateTypes.length,rateTypes:rateTypes,willBatch:rateTypes.length>3},timestamp:Date.now(),runId:'timeout-debug',hypothesisId:'H1'})}).catch(()=>{});
+      (process.env.INGEST_URL ? fetch(process.env.INGEST_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'rates.ts:callRatesAPI:strategy',message:'Rate fetching strategy',data:{rateTypesCount:rateTypes.length,rateTypes:rateTypes,willBatch:rateTypes.length>3},timestamp:Date.now(),runId:'timeout-debug',hypothesisId:'H1'})}).catch(()=>{}) : undefined);
       // #endregion
 
       // If multiple rate types, batch them into groups and run batches in parallel
@@ -271,7 +271,7 @@ async function callRatesAPI(requestBody: any): Promise<any> {
 
             const startTime = Date.now();
             // #region agent log
-            fetch('http://127.0.0.1:7242/ingest/fbdc8caf-9cc6-403b-83c1-f186ed9b4695',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'rates.ts:callRatesAPI:parallelRequest',message:'Starting parallel request',data:{rateType:rateType,startTime:startTime},timestamp:Date.now(),runId:'timeout-debug',hypothesisId:'H1'})}).catch(()=>{});
+            (process.env.INGEST_URL ? fetch(process.env.INGEST_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'rates.ts:callRatesAPI:parallelRequest',message:'Starting parallel request',data:{rateType:rateType,startTime:startTime},timestamp:Date.now(),runId:'timeout-debug',hypothesisId:'H1'})}).catch(()=>{}) : undefined);
             // #endregion
 
           try {
@@ -296,7 +296,7 @@ async function callRatesAPI(requestBody: any): Promise<any> {
 
             const duration = Date.now() - startTime;
             // #region agent log
-            fetch('http://127.0.0.1:7242/ingest/fbdc8caf-9cc6-403b-83c1-f186ed9b4695',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'rates.ts:callRatesAPI:parallelResponse',message:'Parallel request completed',data:{rateType:rateType,duration:duration,hasRates:!!response?.data?.results?.rates,ratesCount:Array.isArray(response?.data?.results?.rates)?response.data.results.rates.length:0},timestamp:Date.now(),runId:'timeout-debug',hypothesisId:'H1'})}).catch(()=>{});
+            (process.env.INGEST_URL ? fetch(process.env.INGEST_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'rates.ts:callRatesAPI:parallelResponse',message:'Parallel request completed',data:{rateType:rateType,duration:duration,hasRates:!!response?.data?.results?.rates,ratesCount:Array.isArray(response?.data?.results?.rates)?response.data.results.rates.length:0},timestamp:Date.now(),runId:'timeout-debug',hypothesisId:'H1'})}).catch(()=>{}) : undefined);
             // #endregion
 
             console.log(`[RATES] Rate type ${rateType} completed in ${duration}ms`);
@@ -304,7 +304,7 @@ async function callRatesAPI(requestBody: any): Promise<any> {
           } catch (error: any) {
             const duration = Date.now() - startTime;
             // #region agent log
-            fetch('http://127.0.0.1:7242/ingest/fbdc8caf-9cc6-403b-83c1-f186ed9b4695',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'rates.ts:callRatesAPI:parallelError',message:'Parallel request failed',data:{rateType:rateType,duration:duration,errorMessage:error?.message},timestamp:Date.now(),runId:'timeout-debug',hypothesisId:'H1'})}).catch(()=>{});
+            (process.env.INGEST_URL ? fetch(process.env.INGEST_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'rates.ts:callRatesAPI:parallelError',message:'Parallel request failed',data:{rateType:rateType,duration:duration,errorMessage:error?.message},timestamp:Date.now(),runId:'timeout-debug',hypothesisId:'H1'})}).catch(()=>{}) : undefined);
             // #endregion
             console.warn(`[RATES] Rate type ${rateType} failed after ${duration}ms:`, error.message);
             // Return empty result for failed rate type (don't fail entire request)
@@ -317,7 +317,7 @@ async function callRatesAPI(requestBody: any): Promise<any> {
           const batchDuration = Date.now() - batchStartTime;
           
           // #region agent log
-          fetch('http://127.0.0.1:7242/ingest/fbdc8caf-9cc6-403b-83c1-f186ed9b4695',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'rates.ts:callRatesAPI:batchComplete',message:'Batch completed',data:{batchIndex:batchIndex+1,totalBatches:batches.length,batchDuration:batchDuration,responsesCount:batchResponses.length,successCount:batchResponses.filter(r=>r?.data?.results?.rates?.length>0).length},timestamp:Date.now(),runId:'timeout-debug',hypothesisId:'H1'})}).catch(()=>{});
+          (process.env.INGEST_URL ? fetch(process.env.INGEST_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'rates.ts:callRatesAPI:batchComplete',message:'Batch completed',data:{batchIndex:batchIndex+1,totalBatches:batches.length,batchDuration:batchDuration,responsesCount:batchResponses.length,successCount:batchResponses.filter(r=>r?.data?.results?.rates?.length>0).length},timestamp:Date.now(),runId:'timeout-debug',hypothesisId:'H1'})}).catch(()=>{}) : undefined);
           // #endregion
 
           console.log(`[RATES] Batch ${batchIndex + 1}/${batches.length} completed in ${batchDuration}ms`);
@@ -365,7 +365,7 @@ async function callRatesAPI(requestBody: any): Promise<any> {
         });
 
         // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/fbdc8caf-9cc6-403b-83c1-f186ed9b4695',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'rates.ts:callRatesAPI:beforeShip2PrimusRequest',message:'About to call ship2PrimusRequest (single)',data:{method:'GET',urlLength:urlWithQuery.length,rateTypesCount:rateTypesList?.length||1},timestamp:Date.now(),runId:'timeout-debug',hypothesisId:'H1'})}).catch(()=>{});
+        (process.env.INGEST_URL ? fetch(process.env.INGEST_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'rates.ts:callRatesAPI:beforeShip2PrimusRequest',message:'About to call ship2PrimusRequest (single)',data:{method:'GET',urlLength:urlWithQuery.length,rateTypesCount:rateTypesList?.length||1},timestamp:Date.now(),runId:'timeout-debug',hypothesisId:'H1'})}).catch(()=>{}) : undefined);
         // #endregion
 
         let data: any;
@@ -394,7 +394,7 @@ async function callRatesAPI(requestBody: any): Promise<any> {
           }
           const duration = Date.now() - startTime;
           // #region agent log
-          fetch('http://127.0.0.1:7242/ingest/fbdc8caf-9cc6-403b-83c1-f186ed9b4695',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'rates.ts:callRatesAPI:singleRequestComplete',message:'Single request completed',data:{duration:duration,hasRates:!!data?.data?.results?.rates,ratesCount:Array.isArray(data?.data?.results?.rates)?data.data.results.rates.length:0},timestamp:Date.now(),runId:'timeout-debug',hypothesisId:'H1'})}).catch(()=>{});
+          (process.env.INGEST_URL ? fetch(process.env.INGEST_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'rates.ts:callRatesAPI:singleRequestComplete',message:'Single request completed',data:{duration:duration,hasRates:!!data?.data?.results?.rates,ratesCount:Array.isArray(data?.data?.results?.rates)?data.data.results.rates.length:0},timestamp:Date.now(),runId:'timeout-debug',hypothesisId:'H1'})}).catch(()=>{}) : undefined);
           // #endregion
           console.log(`[RATES] Single request completed in ${duration}ms`);
           
@@ -411,7 +411,7 @@ async function callRatesAPI(requestBody: any): Promise<any> {
           return data;
         } catch (error: any) {
           // #region agent log
-          fetch('http://127.0.0.1:7242/ingest/fbdc8caf-9cc6-403b-83c1-f186ed9b4695',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'rates.ts:callRatesAPI:singleRequestError',message:'Single request failed',data:{errorName:error?.name,errorMessage:error?.message,errorCode:error?.code},timestamp:Date.now(),runId:'timeout-debug',hypothesisId:'H1'})}).catch(()=>{});
+          (process.env.INGEST_URL ? fetch(process.env.INGEST_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'rates.ts:callRatesAPI:singleRequestError',message:'Single request failed',data:{errorName:error?.name,errorMessage:error?.message,errorCode:error?.code},timestamp:Date.now(),runId:'timeout-debug',hypothesisId:'H1'})}).catch(()=>{}) : undefined);
           // #endregion
           throw error;
         }
@@ -466,7 +466,7 @@ async function callRatesAPI(requestBody: any): Promise<any> {
     console.error('[RATES] API error:', error);
 
     // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/fbdc8caf-9cc6-403b-83c1-f186ed9b4695',{
+    (process.env.INGEST_URL ? fetch(process.env.INGEST_URL,{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
@@ -482,7 +482,7 @@ async function callRatesAPI(requestBody: any): Promise<any> {
         },
         timestamp:Date.now()
       })
-    }).catch(()=>{});
+    }).catch(()=>{}) : undefined);
     // #endregion
 
     throw error;
@@ -503,7 +503,7 @@ async function upsertHubSpotContactIfOptedIn(user: {
   const accessToken = process.env.HUBSPOT_ACCESS_TOKEN;
 
   // #region agent log
-  fetch('http://127.0.0.1:7242/ingest/fbdc8caf-9cc6-403b-83c1-f186ed9b4695',{
+  (process.env.INGEST_URL ? fetch(process.env.INGEST_URL,{
     method:'POST',
     headers:{'Content-Type':'application/json'},
     body:JSON.stringify({
@@ -519,7 +519,7 @@ async function upsertHubSpotContactIfOptedIn(user: {
       },
       timestamp:Date.now()
     })
-  }).catch(()=>{});
+  }).catch(()=>{}) : undefined);
   // #endregion
 
   // If HubSpot is not configured or user has not opted in, do nothing
@@ -638,13 +638,13 @@ async function createHubSpotNote(
   errorMessage?: string
 ) {
   // #region agent log
-  fetch('http://127.0.0.1:7242/ingest/fbdc8caf-9cc6-403b-83c1-f186ed9b4695',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'rates.ts:createHubSpotNote:entry',message:'createHubSpotNote called',data:{contactEmail,ratesCount:rates.length,hasDealId:!!dealId},timestamp:Date.now(),runId:'hubspot-debug',hypothesisId:'H4'})}).catch(()=>{});
+  (process.env.INGEST_URL ? fetch(process.env.INGEST_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'rates.ts:createHubSpotNote:entry',message:'createHubSpotNote called',data:{contactEmail,ratesCount:rates.length,hasDealId:!!dealId},timestamp:Date.now(),runId:'hubspot-debug',hypothesisId:'H4'})}).catch(()=>{}) : undefined);
   // #endregion
   
   const accessToken = process.env.HUBSPOT_PRIVATE_APP_TOKEN || process.env.HUBSPOT_ACCESS_TOKEN;
   if (!accessToken) {
     // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/fbdc8caf-9cc6-403b-83c1-f186ed9b4695',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'rates.ts:createHubSpotNote:noToken',message:'No HubSpot token configured',data:{hasPrivateToken:!!process.env.HUBSPOT_PRIVATE_APP_TOKEN,hasAccessToken:!!process.env.HUBSPOT_ACCESS_TOKEN},timestamp:Date.now(),runId:'hubspot-debug',hypothesisId:'H4'})}).catch(()=>{});
+    (process.env.INGEST_URL ? fetch(process.env.INGEST_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'rates.ts:createHubSpotNote:noToken',message:'No HubSpot token configured',data:{hasPrivateToken:!!process.env.HUBSPOT_PRIVATE_APP_TOKEN,hasAccessToken:!!process.env.HUBSPOT_ACCESS_TOKEN},timestamp:Date.now(),runId:'hubspot-debug',hypothesisId:'H4'})}).catch(()=>{}) : undefined);
     // #endregion
     console.log('[HubSpot] Skipping note creation - no token configured');
     return; // Skip if not configured
@@ -675,7 +675,7 @@ async function createHubSpotNote(
     if (!searchResponse.ok) {
       const errorText = await searchResponse.text();
       // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/fbdc8caf-9cc6-403b-83c1-f186ed9b4695',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'rates.ts:createHubSpotNote:searchFailed',message:'Contact search failed',data:{status:searchResponse.status,errorText:errorText.substring(0,200)},timestamp:Date.now(),runId:'hubspot-debug',hypothesisId:'H3'})}).catch(()=>{});
+      (process.env.INGEST_URL ? fetch(process.env.INGEST_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'rates.ts:createHubSpotNote:searchFailed',message:'Contact search failed',data:{status:searchResponse.status,errorText:errorText.substring(0,200)},timestamp:Date.now(),runId:'hubspot-debug',hypothesisId:'H3'})}).catch(()=>{}) : undefined);
       // #endregion
       console.warn('[HubSpot] Contact search failed:', searchResponse.status, errorText);
       return;
@@ -684,7 +684,7 @@ async function createHubSpotNote(
     const searchData = await searchResponse.json() as any;
     if (!searchData.results || searchData.results.length === 0) {
       // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/fbdc8caf-9cc6-403b-83c1-f186ed9b4695',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'rates.ts:createHubSpotNote:contactNotFound',message:'Contact not found',data:{contactEmail,searchDataKeys:Object.keys(searchData)},timestamp:Date.now(),runId:'hubspot-debug',hypothesisId:'H2'})}).catch(()=>{});
+      (process.env.INGEST_URL ? fetch(process.env.INGEST_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'rates.ts:createHubSpotNote:contactNotFound',message:'Contact not found',data:{contactEmail,searchDataKeys:Object.keys(searchData)},timestamp:Date.now(),runId:'hubspot-debug',hypothesisId:'H2'})}).catch(()=>{}) : undefined);
       // #endregion
       console.log(`[HubSpot] Contact not found for email: ${contactEmail}`);
       return; // Contact not found
@@ -692,12 +692,14 @@ async function createHubSpotNote(
 
     const contactId = searchData.results[0].id;
     // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/fbdc8caf-9cc6-403b-83c1-f186ed9b4695',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'rates.ts:createHubSpotNote:contactFound',message:'Contact found, creating note',data:{contactId,contactEmail},timestamp:Date.now(),runId:'hubspot-debug',hypothesisId:'H2'})}).catch(()=>{});
+    (process.env.INGEST_URL ? fetch(process.env.INGEST_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'rates.ts:createHubSpotNote:contactFound',message:'Contact found, creating note',data:{contactId,contactEmail},timestamp:Date.now(),runId:'hubspot-debug',hypothesisId:'H2'})}).catch(()=>{}) : undefined);
     // #endregion
 
-    // Build request summary (lane + key shipment inputs)
-    const origin = `${requestPayload.originCity || ''}, ${requestPayload.originState || ''} ${requestPayload.originZipcode || ''}`.trim();
-    const destination = `${requestPayload.destinationCity || ''}, ${requestPayload.destinationState || ''} ${requestPayload.destinationZipcode || ''}`.trim();
+    // Build request summary (lane + key shipment inputs); always include postal codes for S2
+    const originZip = requestPayload.originZipcode ?? requestPayload.originZip ?? '';
+    const destZip = requestPayload.destinationZipcode ?? requestPayload.destinationZip ?? '';
+    const origin = [requestPayload.originCity, requestPayload.originState, originZip].filter(Boolean).join(', ') || originZip || '—';
+    const destination = [requestPayload.destinationCity, requestPayload.destinationState, destZip].filter(Boolean).join(', ') || destZip || '—';
     const lane = `${origin} → ${destination}`;
     
     const freightInfo = requestPayload.freightInfo?.[0] || {};
@@ -730,16 +732,18 @@ async function createHubSpotNote(
       statusSection = `💰 Top 3 Options:\n${top3Rates.map(rate => `   ${rate}`).join('\n')}`;
     } else if (status === 'no_rates') {
       statusIndicator = '⚠️';
-      statusSection = `⚠️ No rates found for this request.\n   Rate token was ${requestPayload.rateTokenConsumed ? 'not consumed' : 'NOT consumed'}.`;
+      statusSection = `⚠️ No rates found for this request.\n   Rate token was ${requestPayload.rateTokenConsumed ? 'consumed' : 'NOT consumed'}.`;
     } else if (status === 'error') {
       statusIndicator = '❌';
       statusSection = `❌ API Error:\n   ${errorMessage || 'Unknown error occurred'}\n   Rate token was ${requestPayload.rateTokenConsumed ? 'not consumed' : 'NOT consumed'}.`;
     }
 
-    // Build formatted note body with proper styling
+    // Build formatted note body with proper styling (postal codes always visible for S2)
     const noteBody = `${statusIndicator} Shipping Rate Request
 
 📍 Lane: ${lane}
+   Origin ZIP/Postal: ${originZip || '—'}
+   Destination ZIP/Postal: ${destZip || '—'}
 
 📋 Shipment Details:
 ${shipmentDetails.map(detail => `   • ${detail}`).join('\n')}
@@ -787,7 +791,7 @@ ${statusSection}`;
     if (!noteResponse.ok) {
       const errorText = await noteResponse.text();
       // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/fbdc8caf-9cc6-403b-83c1-f186ed9b4695',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'rates.ts:createHubSpotNote:noteFailed',message:'Note creation API failed',data:{status:noteResponse.status,errorText:errorText.substring(0,500),notePayloadKeys:Object.keys(notePayload)},timestamp:Date.now(),runId:'hubspot-debug',hypothesisId:'H3'})}).catch(()=>{});
+      (process.env.INGEST_URL ? fetch(process.env.INGEST_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'rates.ts:createHubSpotNote:noteFailed',message:'Note creation API failed',data:{status:noteResponse.status,errorText:errorText.substring(0,500),notePayloadKeys:Object.keys(notePayload)},timestamp:Date.now(),runId:'hubspot-debug',hypothesisId:'H3'})}).catch(()=>{}) : undefined);
       // #endregion
       console.error('[HubSpot] Note creation failed:', noteResponse.status, errorText);
       return;
@@ -795,12 +799,12 @@ ${statusSection}`;
 
     const noteResult = await noteResponse.json() as { id?: string };
     // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/fbdc8caf-9cc6-403b-83c1-f186ed9b4695',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'rates.ts:createHubSpotNote:success',message:'Note created successfully',data:{contactId,noteId:noteResult.id},timestamp:Date.now(),runId:'hubspot-debug',hypothesisId:'H3'})}).catch(()=>{});
+    (process.env.INGEST_URL ? fetch(process.env.INGEST_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'rates.ts:createHubSpotNote:success',message:'Note created successfully',data:{contactId,noteId:noteResult.id},timestamp:Date.now(),runId:'hubspot-debug',hypothesisId:'H3'})}).catch(()=>{}) : undefined);
     // #endregion
     console.log(`[HubSpot] ✅ Note created successfully for contact ${contactId}:`, noteResult.id);
   } catch (error) {
     // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/fbdc8caf-9cc6-403b-83c1-f186ed9b4695',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'rates.ts:createHubSpotNote:exception',message:'Exception in createHubSpotNote',data:{errorMessage:error instanceof Error?error.message:String(error),errorName:error instanceof Error?error.name:'Unknown'},timestamp:Date.now(),runId:'hubspot-debug',hypothesisId:'H1'})}).catch(()=>{});
+    (process.env.INGEST_URL ? fetch(process.env.INGEST_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'rates.ts:createHubSpotNote:exception',message:'Exception in createHubSpotNote',data:{errorMessage:error instanceof Error?error.message:String(error),errorName:error instanceof Error?error.name:'Unknown'},timestamp:Date.now(),runId:'hubspot-debug',hypothesisId:'H1'})}).catch(()=>{}) : undefined);
     // #endregion
     console.error('[HubSpot] Note creation error:', error);
     // Don't fail the request if HubSpot fails
@@ -848,7 +852,7 @@ router.post('/rates', authenticateToken, validateBody(rateRequestSchema), async 
       }
 
       // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/fbdc8caf-9cc6-403b-83c1-f186ed9b4695',{
+      (process.env.INGEST_URL ? fetch(process.env.INGEST_URL,{
         method:'POST',
         headers:{'Content-Type':'application/json'},
         body:JSON.stringify({
@@ -866,7 +870,7 @@ router.post('/rates', authenticateToken, validateBody(rateRequestSchema), async 
           },
           timestamp:Date.now()
         })
-      }).catch(()=>{});
+      }).catch(()=>{}) : undefined);
       // #endregion
     } catch (metaError) {
       console.warn('[RATES] Metadata preload failed (non-critical):', metaError);
@@ -886,15 +890,22 @@ router.post('/rates', authenticateToken, validateBody(rateRequestSchema), async 
       });
     }
 
+    const originPostal = requestPayload.originZipcode ?? requestPayload.originZip ?? '';
+    const destPostal = requestPayload.destinationZipcode ?? requestPayload.destinationZip ?? '';
     console.log('[RATES] Incoming request', {
       requestId,
       userId,
       clientId,
-      originZipcode: requestPayload.originZipcode,
-      destinationZipcode: requestPayload.destinationZipcode,
+      originCity: requestPayload.originCity,
+      originState: requestPayload.originState,
+      originZipcode: originPostal,
+      destinationCity: requestPayload.destinationCity,
+      destinationState: requestPayload.destinationState,
+      destinationZipcode: destPostal,
       pickupDate: requestPayload.pickupDate,
       modes: requestPayload.rateTypesList,
     });
+    console.log('[RATES] Lane (postal codes): origin', originPostal || '(none)', '→ destination', destPostal || '(none)');
 
     // Forward request to Ship2Primus (or legacy proxy) - payload forwarded UNCHANGED (per requirements)
     let apiResponse: any;
@@ -1079,9 +1090,26 @@ router.post('/rates', authenticateToken, validateBody(rateRequestSchema), async 
     // Sort rates cheapest first (matching Lambda behavior) - do this early
     rates.sort((a, b) => (a.total ?? a.totalCost ?? Infinity) - (b.total ?? b.totalCost ?? Infinity));
 
+    // CRITICAL: Hard limit to prevent frontend crash from large responses (max 100 rates total)
+    const RATES_HARD_LIMIT = 100;
+    const sortedRates = rates.slice(0, RATES_HARD_LIMIT);
+
+    // Pagination: default 50 per page, read from query (optional; if not sent, return all capped rates)
+    const page = Math.max(1, parseInt(String(req.query.page), 10) || 1);
+    const limit = Math.min(50, Math.max(1, parseInt(String(req.query.limit), 10) || 50));
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + limit;
+    const paginatedRates = sortedRates.slice(startIndex, endIndex);
+    const totalRatesCount = sortedRates.length;
+    const hasMore = endIndex < totalRatesCount;
+
+    if (process.env.NODE_ENV !== 'production') {
+      console.log(`[RATES] Returning ${paginatedRates.length} of ${totalRatesCount} total rates (page ${page}, limit ${limit})`);
+    }
+
     // OPTIMIZATION: Start all non-critical operations in parallel, don't await them
     // This prevents timeout issues when dealing with large rate responses
-    
+
     // 1. Consume rate token (critical - must complete before response)
     let rateTokensRemaining: number | null = null;
     let rateTokensUsed: number | null = null;
@@ -1122,8 +1150,8 @@ router.post('/rates', authenticateToken, validateBody(rateRequestSchema), async 
         if (!quoteError && quoteRequest) {
           dbState.quoteId = quoteRequest.id;
           
-          // Prepare rates for insertion
-          const ratesToInsert = rates.map((rate: any) => {
+          // Prepare rates for insertion (use capped sortedRates to avoid huge DB writes)
+          const ratesToInsert = sortedRates.map((rate: any) => {
             const carrierName = rate.name || 
                                rate.carrierName || 
                                rate.carrier_name || 
@@ -1206,7 +1234,7 @@ router.post('/rates', authenticateToken, validateBody(rateRequestSchema), async 
                 action: 'GET_RATES',
                 metadata_json: {
                   quoteRequestId: quoteRequest.id,
-                  ratesCount: rates.length,
+                  ratesCount: totalRatesCount,
                 },
               });
             } catch (err: any) {
@@ -1242,14 +1270,14 @@ router.post('/rates', authenticateToken, validateBody(rateRequestSchema), async 
 
     // Normalize rates - extract carrier name from various possible fields
     // Log first rate structure for debugging (only in development)
-    if (process.env.NODE_ENV === 'development' && rates.length > 0) {
-      console.log('[RATES] Sample rate structure:', JSON.stringify(rates[0], null, 2));
+    if (process.env.NODE_ENV === 'development' && sortedRates.length > 0) {
+      console.log('[RATES] Sample rate structure:', JSON.stringify(sortedRates[0], null, 2));
     }
 
     // Create HubSpot note if user exists (always log, regardless of rates count)
     if (dbUser?.email) {
-      // Normalize rates for HubSpot note
-      const normalizedRates: NormalizedRate[] = rates.map((rate: any) => {
+      // Normalize rates for HubSpot note (use sortedRates = capped full set)
+      const normalizedRates: NormalizedRate[] = sortedRates.map((rate: any) => {
         const carrierName = rate.name || 
                            rate.carrierName || 
                            rate.carrier_name || 
@@ -1283,7 +1311,7 @@ router.post('/rates', authenticateToken, validateBody(rateRequestSchema), async 
       const dealId = req.body.hubspotContext?.dealId || req.query.dealId as string | undefined;
       
       // Determine status and prepare payload
-      const status: 'success' | 'no_rates' | 'error' = rates.length > 0 ? 'success' : 'no_rates';
+      const status: 'success' | 'no_rates' | 'error' = sortedRates.length > 0 ? 'success' : 'no_rates';
       const notePayload = {
         ...requestPayload,
         rateTokenConsumed: true, // Token was consumed for successful requests
@@ -1314,26 +1342,32 @@ router.post('/rates', authenticateToken, validateBody(rateRequestSchema), async 
     dbPromise.catch(() => {}); // Fire and forget
 
     // Log final response before sending
-    console.log('[RATES] Sending response to client:', {
-      requestId,
-      ratesCount: rates.length,
-      firstRate: rates[0] ? {
-        carrier: rates[0].name || rates[0].carrierName || 'Unknown',
-        service: rates[0].serviceName || rates[0].serviceLevel || 'Unknown',
-        price: rates[0].total || rates[0].totalCost || 0,
-      } : null,
-      rateTokensRemaining,
-      rateTokensUsed,
-      quoteId: dbState.quoteId || null,
-    });
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('[RATES] Sending response to client:', {
+        requestId,
+        ratesCount: paginatedRates.length,
+        totalRates: totalRatesCount,
+        page,
+        rateTokensRemaining,
+        rateTokensUsed,
+        quoteId: dbState.quoteId || null,
+      });
+    }
 
-    // Return response matching existing JS expected format, with additional token metadata
+    // Return response matching existing JS expected format, with pagination and token metadata
     res.json({
       requestId,
-      quoteId: dbState.quoteId || undefined, // Include quoteId if available (may be null if DB save still in progress)
+      quoteId: dbState.quoteId || undefined,
       rateTokensRemaining,
       rateTokensUsed,
-      rates: rates.map((rate: any) => {
+      pagination: {
+        page,
+        limit,
+        total: totalRatesCount,
+        totalPages: Math.ceil(totalRatesCount / limit),
+        hasMore,
+      },
+      rates: paginatedRates.map((rate: any) => {
         // Extract carrier name - check multiple possible field names
         // Priority: name > carrierName > carrier_name > carrier > companyName > company
         const carrierName = rate.name || 

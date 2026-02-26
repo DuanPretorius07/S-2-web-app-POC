@@ -80,8 +80,12 @@ const PORT = process.env.PORT || 5000;
 // CRITICAL: Enable trust proxy for Vercel (must be first)
 app.set('trust proxy', 1);
 
-// CORS configuration
-const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:3000'];
+// CORS configuration: production uses env or defaults; dev uses localhost
+const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || (
+  process.env.NODE_ENV === 'production'
+    ? ['https://s-2-web-app-poc.vercel.app', 'https://*.vercel.app']
+    : ['http://localhost:3000', 'http://localhost:5173']
+);
 app.use(
   cors({
     origin: (origin, callback) => {
@@ -314,8 +318,10 @@ app.use(errorHandler);
 if (process.env.VERCEL !== '1') {
 app.listen(PORT, () => {
     console.log(`✅ Server running on port ${PORT}`);
-    console.log(`   Health check: http://localhost:${PORT}/health`);
-    console.log(`   Supabase test: http://localhost:${PORT}/api/test/supabase`);
+    if (process.env.NODE_ENV !== 'production') {
+      console.log(`   Health check: http://localhost:${PORT}/health`);
+      console.log(`   Supabase test: http://localhost:${PORT}/api/test/supabase`);
+    }
   }).on('error', (err: any) => {
     console.error(`❌ Failed to start server on port ${PORT}:`, err.message);
     if (err.code === 'EADDRINUSE') {

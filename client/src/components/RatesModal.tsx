@@ -18,9 +18,11 @@ interface RatesModalProps {
   onBook: (rateId: string) => void;
   onClose: () => void;
   loading: boolean;
+  /** True after user has placed their one allowed booking for this quote */
+  bookingExhausted?: boolean;
 }
 
-export default function RatesModal({ rates, onBook, onClose, loading }: RatesModalProps) {
+export default function RatesModal({ rates, onBook, onClose, loading, bookingExhausted = false }: RatesModalProps) {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg shadow-xl max-w-6xl w-full max-h-[90vh] overflow-hidden flex flex-col">
@@ -29,7 +31,7 @@ export default function RatesModal({ rates, onBook, onClose, loading }: RatesMod
           <h2 className="text-2xl font-bold text-gray-900">Available Rates</h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 text-2xl font-bold"
+            className="text-gray-400 hover:text-gray-600 text-2xl font-bold p-1"
             aria-label="Close"
           >
             ×
@@ -38,14 +40,19 @@ export default function RatesModal({ rates, onBook, onClose, loading }: RatesMod
 
         {/* Content - Scrollable */}
         <div className="overflow-y-auto flex-1 p-6">
-          <RatesTable rates={rates} onBook={onBook} loading={loading} />
+          <RatesTable
+            rates={rates}
+            onBook={onBook}
+            loading={loading}
+            bookingExhausted={bookingExhausted}
+          />
         </div>
 
         {/* Footer */}
         <div className="border-t border-gray-200 p-4 bg-gray-50">
           <button
             onClick={onClose}
-            className="w-full py-2 px-4 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 font-semibold"
+            className="w-full py-3 px-4 bg-s2-red hover:bg-s2-red-dark text-white rounded-lg font-semibold"
           >
             Close
           </button>
